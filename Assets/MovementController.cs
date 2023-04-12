@@ -26,10 +26,10 @@ public class MovementController : MonoBehaviour
     }
 
     // Update is called once per frame
-    void Update()
+    void FixedUpdate()
     {
-        isCeiling();
-        isWalled();
+        
+        
         canMove();
        
         if(!isGrounded() && radian<=1 && radian >0) //Up trajectory
@@ -39,7 +39,7 @@ public class MovementController : MonoBehaviour
         else if(!isGrounded() && radian <= 0) //Fall code
         {
             transform.position = new Vector2(transform.position.x, transform.position.y + Mathf.Sin(radian) * (dist* Time.deltaTime));
-            radian -= 0.035f;
+            radian -= 0.15f;
         }
         if (radian <=-1 && !isGrounded()) //Gravity cap
         {
@@ -54,11 +54,15 @@ public class MovementController : MonoBehaviour
         if (transform.position.x <= -6.18f)//left restriction
         {
             transform.position = new Vector2(-6.17f, transform.position.y);
+            speed = 0;
         }
         if(transform.position.x>=-2.135f)//right restriction
         {
             transform.position = new Vector2(-2.14f, transform.position.y);
+            speed = 0;
         }
+        isCeiling();
+        isWalled();
     }
 
     private bool isGrounded()
@@ -68,6 +72,7 @@ public class MovementController : MonoBehaviour
         {
             if(transform.position.y <= raycastHit.collider.transform.position.y + raycastHit.collider.transform.localScale.y)
             transform.position = new Vector2(transform.position.x, raycastHit.collider.transform.position.y + raycastHit.collider.transform.localScale.y+0.1f);
+            radian = 0;
         }
         return raycastHit.collider !=null;
     }
@@ -80,7 +85,7 @@ public class MovementController : MonoBehaviour
             if (transform.position.x <= raycastHit.collider.transform.position.x + raycastHit.collider.transform.localScale.x)
             {
                 speed = 0;
-                transform.position = new Vector2(raycastHit.collider.transform.position.x + raycastHit.collider.transform.localScale.x +0.05f , transform.position.y);
+                transform.position = new Vector2(raycastHit.collider.transform.position.x + raycastHit.collider.transform.localScale.x/2 +0.2f , transform.position.y);
             }
         }
         RaycastHit2D raycastHit2 = Physics2D.Raycast(capsuleCollider.bounds.center, Vector2.right, capsuleCollider.bounds.extents.x + 0.05f, platformLayerMask);
@@ -89,7 +94,7 @@ public class MovementController : MonoBehaviour
             if (transform.position.x <= raycastHit2.collider.transform.position.x + raycastHit2.collider.transform.localScale.x)
             {
                 speed = 0;
-                transform.position = new Vector2(raycastHit2.collider.transform.position.x - raycastHit2.collider.transform.localScale.x -0.05f, transform.position.y);
+                transform.position = new Vector2(raycastHit2.collider.transform.position.x - raycastHit2.collider.transform.localScale.x/2 -0.2f, transform.position.y);
             }
         }
 
@@ -99,8 +104,11 @@ public class MovementController : MonoBehaviour
         RaycastHit2D raycastHit = Physics2D.Raycast(capsuleCollider.bounds.center, Vector2.up, capsuleCollider.bounds.extents.y + 0.1f, platformLayerMask);
         if (raycastHit.collider != null)
         {
-            if (transform.position.y >= raycastHit.collider.transform.position.y + raycastHit.collider.transform.localScale.y)
-                transform.position = new Vector2(transform.position.x, raycastHit.collider.transform.position.y - raycastHit.collider.transform.localScale.y - 0.1f);
+            if (transform.position.y >= raycastHit.collider.transform.position.y - raycastHit.collider.transform.localScale.y)
+            transform.position = new Vector2(transform.position.x, raycastHit.collider.transform.position.y - raycastHit.collider.transform.localScale.y - 0.1f);
+            radian = 0;
+
+            
         }
     }
 
@@ -144,10 +152,10 @@ public class MovementController : MonoBehaviour
             transform.position = new Vector2(transform.position.x + (speed * Time.deltaTime), transform.position.y);
             if (speed > 0)
             {
-                speed -= 0.1f;
+                speed -= 0.2f;
             }
             if (speed < 0)
-                speed += 0.1f;
+                speed += 0.2f;
             if (speed < 0.1f && speed > -0.1f)
             {
                 speed = 0;
@@ -159,12 +167,12 @@ public class MovementController : MonoBehaviour
         if(is_rocket == false)
         {
             transform.position = new Vector2(transform.position.x, transform.position.y + Mathf.Sin(radian) * (dist * Time.deltaTime));
-            radian -= 0.03f;
+            radian -= 0.06f;
         }
         else
         {
             transform.position = new Vector2(transform.position.x, transform.position.y + Mathf.Sin(radian) * (6 * Time.deltaTime));
-            radian -= 0.05f;
+            radian -= 0.19f;
         }
     }
 }
