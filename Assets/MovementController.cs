@@ -17,10 +17,9 @@ public class MovementController : MonoBehaviour
     float speed = 0;
     [SerializeField]
     float radian = 0;
-    float rocket_radian = 0;
     [SerializeField]
     float dist = 10 ;
-    bool flag = false;
+    bool is_rocket = false;
     void Start()
     {
         capsuleCollider = GetComponent<CapsuleCollider2D>();
@@ -31,17 +30,11 @@ public class MovementController : MonoBehaviour
     {
         isCeiling();
         isWalled();
-        if(!isGrounded() && radian<=1 && radian >0 && flag !=true) //Up trajectory
+        canMove();
+       
+        if(!isGrounded() && radian<=1 && radian >0) //Up trajectory
         {
-            transform.position = new Vector2(transform.position.x, transform.position.y + Mathf.Sin(radian) * (dist * Time.deltaTime));
-            radian -= 0.03f;
-        }
-        if (!isGrounded() && flag != false) //Up Rocket trajectory
-        {
-            transform.position = new Vector2(transform.position.x, transform.position.y + Mathf.Sin(rocket_radian) * (6 * Time.deltaTime));
-            rocket_radian -= 0.05f;
-            if (rocket_radian <= 0)
-                radian = rocket_radian;
+            upTrajectory();
         }
         else if(!isGrounded() && radian <= 0) //Fall code
         {
@@ -54,51 +47,18 @@ public class MovementController : MonoBehaviour
             transform.position = new Vector2(transform.position.x, transform.position.y + Mathf.Sin(radian) * (dist*Time.deltaTime));
             
         }
-        if (Input.GetKey(KeyCode.Space) && isGrounded())//Jump code
+        if (Input.GetKey(KeyCode.Space))//Jump code
         {
-            flag = false;
-            radian = 1;
-            transform.position = new Vector2(transform.position.x, transform.position.y + Mathf.Sin(radian) * (dist*Time.deltaTime));
-            temp = Time.time + 0.25f;
-            counter = 8;
+            canJump();
         }
-        if (Input.GetKey(KeyCode.Space) && !isGrounded() && Time.time >= temp && counter !=0)//Rocket Stall code
+        if (transform.position.x <= -6.18f)//left restriction
         {
-            rocket_radian = 1;
-            transform.position = new Vector2(transform.position.x, transform.position.y + Mathf.Sin(rocket_radian) * (6 * Time.deltaTime));
-            temp = Time.time + 0.15f;
-            counter--;
-            flag = true;
+            transform.position = new Vector2(-6.17f, transform.position.y);
         }
-        if(Input.GetKey(KeyCode.A))//Left movement
+        if(transform.position.x>=-2.135f)//right restriction
         {
-            transform.position = new Vector2(transform.position.x + (speed*Time.deltaTime), transform.position.y);
-            if (speed > -7.5)
-                speed -= 0.2f;
+            transform.position = new Vector2(-2.14f, transform.position.y);
         }
-        if (Input.GetKey(KeyCode.D))//Right movement
-        {
-            transform.position = new Vector2(transform.position.x+(speed*Time.deltaTime),transform.position.y);
-            if (speed < 7.5)
-                speed += 0.2f;
-        }
-        if (speed != 0 && !Input.GetKey(KeyCode.D) && !Input.GetKey(KeyCode.A)) //friction
-        {
-            
-            transform.position = new Vector2(transform.position.x + (speed * Time.deltaTime), transform.position.y);
-            if (speed > 0)
-            {
-                speed -= 0.1f;
-            }
-            if (speed < 0)
-                speed += 0.1f;
-            if (speed < 0.1f && speed > -0.1f)
-            {
-                speed = 0;
-            }
-        }
-
-
     }
 
     private bool isGrounded()
@@ -141,6 +101,70 @@ public class MovementController : MonoBehaviour
         {
             if (transform.position.y >= raycastHit.collider.transform.position.y + raycastHit.collider.transform.localScale.y)
                 transform.position = new Vector2(transform.position.x, raycastHit.collider.transform.position.y - raycastHit.collider.transform.localScale.y - 0.1f);
+        }
+    }
+
+    private void canJump()
+    {
+        if (isGrounded())//regular jump
+        {
+            is_rocket = false;
+            radian = 1;
+            transform.position = new Vector2(transform.position.x, transform.position.y + Mathf.Sin(radian) * (dist * Time.deltaTime));
+            temp = Time.time + 0.25f;
+            counter = 8;
+        }
+        else if(!isGrounded() && Time.time >=temp && counter!=0)//rocketstall jump
+        {
+            radian = 1;
+            transform.position = new Vector2(transform.position.x, transform.position.y + Mathf.Sin(radian) * (6 * Time.deltaTime));
+            temp = Time.time + 0.15f;
+            counter--;
+            is_rocket = true;
+        }
+    }
+
+    private void canMove()
+    {
+        if (Input.GetKey(KeyCode.A))//Left movement
+        {
+            transform.position = new Vector2(transform.position.x + (speed * Time.deltaTime), transform.position.y);
+            if (speed > -7.5)
+                speed -= 0.2f;
+        }
+        if (Input.GetKey(KeyCode.D))//Right movement
+        {
+            transform.position = new Vector2(transform.position.x + (speed * Time.deltaTime), transform.position.y);
+            if (speed < 7.5)
+                speed += 0.2f;
+        }
+        if (speed != 0 && !Input.GetKey(KeyCode.D) && !Input.GetKey(KeyCode.A)) //friction
+        {
+
+            transform.position = new Vector2(transform.position.x + (speed * Time.deltaTime), transform.position.y);
+            if (speed > 0)
+            {
+                speed -= 0.1f;
+            }
+            if (speed < 0)
+                speed += 0.1f;
+            if (speed < 0.1f && speed > -0.1f)
+            {
+                speed = 0;
+            }
+        }
+    }
+    private void upTrajectory()
+    {
+        if(is_rocket == false)
+        {
+            transform.position = new Vector2(transform.position.x, transform.position.y + Mathf.Sin(radian) * (dist * Time.deltaTime));
+            radian -= 0.03f;
+        }
+        else
+        {
+            transform.position = new Vector2(transform.position.x, transform.position.y + Mathf.Sin(radian) * (6 * Time.deltaTime));
+            radian -= 0.05f;
         }
     }
 }
