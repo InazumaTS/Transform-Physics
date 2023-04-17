@@ -20,6 +20,8 @@ public class MovementController : MonoBehaviour
     [SerializeField]
     float dist = 10 ;
     bool is_rocket = false;
+    [SerializeField]
+    GameObject rocketGun;
     void Start()
     {
         capsuleCollider = GetComponent<CapsuleCollider2D>();
@@ -63,6 +65,7 @@ public class MovementController : MonoBehaviour
         }
         isCeiling();
         isWalled();
+
     }
 
     private bool isGrounded()
@@ -70,9 +73,27 @@ public class MovementController : MonoBehaviour
         RaycastHit2D raycastHit = Physics2D.Raycast(capsuleCollider.bounds.center, Vector2.down, capsuleCollider.bounds.extents.y + 0.1f, platformLayerMask);
         if (raycastHit.collider!=null)
         {
-            if(transform.position.y <= raycastHit.collider.transform.position.y + raycastHit.collider.transform.localScale.y)
-            transform.position = new Vector2(transform.position.x, raycastHit.collider.transform.position.y + raycastHit.collider.transform.localScale.y+0.1f);
+            
+
+            if (raycastHit.collider.tag == "enemy")
+            {
+                GhostScript ghost = raycastHit.collider.transform.GetComponent<GhostScript>();
+                if (ghost != null)
+                {
+                    ghost.damage();
+                }
+                radian = 1;
+                transform.position = new Vector2(transform.position.x, transform.position.y + Mathf.Sin(radian) * (8 * Time.deltaTime));
+                SpinyScript spiny = raycastHit.collider.transform.GetComponent<SpinyScript>();
+                if(spiny!=null)
+                {
+                    Destroy(this.gameObject);
+                }
+            }
+            else if (transform.position.y <= raycastHit.collider.transform.position.y + raycastHit.collider.transform.localScale.y)
+                transform.position = new Vector2(transform.position.x, raycastHit.collider.transform.position.y + raycastHit.collider.transform.localScale.y + 0.1f);
             radian = 0;
+
         }
         return raycastHit.collider !=null;
     }
@@ -129,6 +150,7 @@ public class MovementController : MonoBehaviour
             temp = Time.time + 0.15f;
             counter--;
             is_rocket = true;
+            Instantiate(rocketGun,new Vector2(transform.position.x, transform.position.y - 0.5f),Quaternion.identity);
         }
     }
 
@@ -138,13 +160,13 @@ public class MovementController : MonoBehaviour
         {
             transform.position = new Vector2(transform.position.x + (speed * Time.deltaTime), transform.position.y);
             if (speed > -7.5)
-                speed -= 0.2f;
+                speed -= 0.4f;
         }
         if (Input.GetKey(KeyCode.D))//Right movement
         {
             transform.position = new Vector2(transform.position.x + (speed * Time.deltaTime), transform.position.y);
             if (speed < 7.5)
-                speed += 0.2f;
+                speed += 0.4f;
         }
         if (speed != 0 && !Input.GetKey(KeyCode.D) && !Input.GetKey(KeyCode.A)) //friction
         {
@@ -156,7 +178,7 @@ public class MovementController : MonoBehaviour
             }
             if (speed < 0)
                 speed += 0.2f;
-            if (speed < 0.1f && speed > -0.1f)
+            if (speed <= 0.1f && speed >= -0.1f)
             {
                 speed = 0;
             }
