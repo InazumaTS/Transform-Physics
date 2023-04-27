@@ -4,6 +4,7 @@ using System.Diagnostics.Tracing;
 using UnityEngine;
 using UnityEngine.UIElements;
 using static UnityEngine.RuleTile.TilingRuleOutput;
+using UnityEngine.SceneManagement;
 
 public class MovementController : MonoBehaviour
 {
@@ -89,6 +90,10 @@ public class MovementController : MonoBehaviour
                 {
                     Destroy(this.gameObject);
                 }
+            }
+            else if(raycastHit.collider.tag == "Finish")
+            {
+                SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex +1);
             }
             else if (transform.position.y <= raycastHit.collider.transform.position.y + raycastHit.collider.transform.localScale.y)
                 transform.position = new Vector2(transform.position.x, raycastHit.collider.transform.position.y + raycastHit.collider.transform.localScale.y + 0.1f);
