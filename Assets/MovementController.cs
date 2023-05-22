@@ -23,6 +23,8 @@ public class MovementController : MonoBehaviour
     bool is_rocket = false;
     [SerializeField]
     GameObject rocketGun;
+    [SerializeField]
+    GameObject Menu;
     void Start()
     {
         capsuleCollider = GetComponent<CapsuleCollider2D>();
@@ -88,6 +90,7 @@ public class MovementController : MonoBehaviour
                 SpinyScript spiny = raycastHit.collider.transform.GetComponent<SpinyScript>();
                 if(spiny!=null)
                 {
+                    Menu.SetActive(true);
                     Destroy(this.gameObject);
                 }
             }
