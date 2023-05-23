@@ -96,6 +96,7 @@ public class MovementController : MonoBehaviour
             }
             else if(raycastHit.collider.tag == "Finish")
             {
+                PlayerPrefs.SetInt("LevelUnlocked", SceneManager.GetActiveScene().buildIndex + 1);
                 SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex +1);
             }
             else if (transform.position.y <= raycastHit.collider.transform.position.y + raycastHit.collider.transform.localScale.y)
